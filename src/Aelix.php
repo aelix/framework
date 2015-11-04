@@ -8,6 +8,8 @@
 namespace aelix\framework;
 
 use aelix\framework\database\DatabaseFactory;
+use aelix\framework\exception\CoreException;
+use aelix\framework\exception\IPrintableException;
 
 class Aelix
 {
@@ -22,8 +24,14 @@ class Aelix
      */
     private static $db;
 
+    /**
+     * aelix constructor.
+     */
     public final function __construct()
     {
+        // register error and exception handler
+        set_exception_handler(['\aelix\framework\Aelix', 'handleException']);
+        set_error_handler(['\aelix\framework\Aelix', 'handleError'], E_ALL);
 
         // init autoloader
         require_once DIR_SRC . 'Autoload.php';
@@ -33,10 +41,10 @@ class Aelix
 
         // load database config
         if (!is_file(DIR_SRC . 'config.php')) {
-            // TODO: proper exceptions
-            exit('Config file src/config.php not found.');
+            throw new CoreException('Could not find file ' . DIR_SRC . 'config.php!', 0,
+                'Unable to find or open the config file for aelix: ' . DIR_SRC . 'config.php');
         }
-        $config = require_once DIR_SRC . 'config.example.php';
+        $config = require_once DIR_SRC . 'config.php';
 
         // init DB
         self::$db = DatabaseFactory::initDatabase(
@@ -44,7 +52,7 @@ class Aelix
             $config['database.host'],
             $config['database.user'],
             $config['database.password'],
-            $config['database.name'],
+            $config['database.database'],
             $config['database.port']
         );
 
@@ -53,14 +61,66 @@ class Aelix
 
     }
 
+    /**
+     * show exceptions
+     * @param \Exception $e
+     */
+    public final static function handleException(\Exception $e)
+    {
+        if ($e instanceof IPrintableException) {
+            $e->show();
+            exit(1);
+        }
+        // repack
+        self::handleException(new CoreException($e->getMessage(), $e->getCode(), '', $e));
+    }
+
+    /**
+     * catches php errors and throws a CoreException instead
+     * @param integer $errorNo
+     * @param string $message
+     * @param string $filename
+     * @param integer $lineNo
+     * @throws CoreException
+     */
+    public final static function handleError($errorNo, $message, $filename, $lineNo)
+    {
+        if (error_reporting() != 0) {
+            $type = 'error';
+            switch ($errorNo) {
+                case 2:
+                    $type = 'warning';
+                    break;
+                case 8:
+                    $type = 'notice';
+                    break;
+            }
+            throw new CoreException('PHP ' . $type . ' in file ' . $filename . ' (' . $lineNo . '): ' . $message, 0);
+        }
+    }
+
+    /**
+     * @return Autoloader
+     */
     public final static function getAutoloader()
     {
         return self::$autoloader;
     }
 
+    /**
+     * @return database\Database
+     */
     public final static function getDB()
     {
         return self::$db;
+    }
+
+    /**
+     * @return bool
+     */
+    public final static function isDebug()
+    {
+        return AELIX_DEBUG;
     }
 
 }

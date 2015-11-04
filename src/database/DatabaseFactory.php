@@ -8,6 +8,8 @@
 namespace aelix\framework\database;
 
 
+use aelix\framework\exception\CoreException;
+
 class DatabaseFactory
 {
 
@@ -18,18 +20,20 @@ class DatabaseFactory
 
         // check if driver exists
         if (empty($driver) || !class_exists($driverClass, true)) {
-            // TODO: proper exceptions
-            exit('Database driver not found.');
+            throw new CoreException('Specified database driver could not be found.', 0,
+                'The configured database driver ' . $driver . ' could not be found. Please check spelling or install the missing module.');
         }
 
         // check if driver class is legit
         if (!is_subclass_of($driverClass, '\aelix\framework\database\Database', true)) {
-            exit('Database driver is corrupted.');
+            throw new CoreException('Database driver corrupted', 0,
+                'The database driver ' . $driver . ' could not be used. It seems to be corrupted.');
         }
 
         // check if driver is supported
         if (!call_user_func([$driverClass, 'isSupported'])) {
-            exit('Database driver is not supported.');
+            throw new CoreException('Database driver not supported', 0,
+                'The database driver ' . $driver . ' is not supported on this platform. Please check the documentation.');
         }
 
         // do the magic

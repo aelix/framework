@@ -5,7 +5,7 @@
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
 
-define('DIR_PUBLIC', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('DS', DIRECTORY_SEPARATOR);
+define('DIR_PUBLIC', dirname(__FILE__) . DS);
 
 require '..' . DS . 'src' . DS . 'bootstrap.php';

@@ -9,6 +9,7 @@ namespace aelix\framework\database\driver;
 
 
 use aelix\framework\database\Database;
+use aelix\framework\exception\CoreException;
 use PDO;
 use PDOException;
 
@@ -21,8 +22,8 @@ class MySQLDatabase extends Database
      * @param string $password password for login
      * @param string $database database to use
      * @param int $port port number if necessary
-     *
-     * @return \PDO
+     * @return PDO
+     * @throws CoreException
      */
     protected function connect($host = '', $username = '', $password = '', $database = '', $port = 0)
     {
@@ -42,8 +43,8 @@ class MySQLDatabase extends Database
         try {
             $pdo = new PDO($dsn, $username, $password, $options);
         } catch (PDOException $e) {
-            // TODO: aelix framework-own database exceptions?
-            throw $e;
+            // DatabaseException depends on the PDO object, but PDO is not initialized yet. Fall back to CoreException
+            throw new CoreException('Failed to connect to database: ' . $e->getMessage(), $e->getCode(), $e->errorInfo, $e);
         }
 
         return $pdo;
