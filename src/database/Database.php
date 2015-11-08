@@ -65,7 +65,7 @@ abstract class Database
      * Execute a query
      *
      * @param $query
-     * @return \PDOStatement
+     * @return DatabaseStatement
      * @throws DatabaseException
      */
     public function query($query)
@@ -73,7 +73,7 @@ abstract class Database
         try {
             $pdoStatement = $this->pdo->query($query);
             if ($pdoStatement instanceof \PDOStatement) {
-                return $pdoStatement;
+                return new DatabaseStatement($this, $pdoStatement, $query);
             }
         } catch (\PDOException $e) {
             throw new DatabaseException('Could not execute query: ' . $e->getMessage(), $this);
@@ -86,7 +86,7 @@ abstract class Database
      * Prepare a statement
      *
      * @param $query
-     * @return \PDOStatement
+     * @return DatabaseStatement
      * @throws DatabaseException
      */
     public function prepare($query)
@@ -94,7 +94,7 @@ abstract class Database
         try {
             $pdoStatement = $this->pdo->prepare($query);
             if ($pdoStatement instanceof \PDOStatement) {
-                return $pdoStatement;
+                return new DatabaseStatement($this, $pdoStatement, $query);
             }
         } catch (\PDOException $e) {
             throw new DatabaseException('Could not prepare statement: ' . $e->getMessage(), $this);
