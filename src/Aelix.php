@@ -7,6 +7,7 @@
 
 namespace aelix\framework;
 
+use aelix\framework\config\Config;
 use aelix\framework\database\DatabaseFactory;
 use aelix\framework\exception\CoreException;
 use aelix\framework\exception\IPrintableException;
@@ -23,6 +24,11 @@ class Aelix
      * @var database\Database
      */
     private static $db;
+
+    /**
+     * @var config\Config
+     */
+    private static $config;
 
     /**
      * aelix constructor.
@@ -58,6 +64,9 @@ class Aelix
 
         // unset $config for security reasons
         unset($config);
+
+        // boot up configs
+        self::$config = new Config('config');
 
     }
 
@@ -105,6 +114,11 @@ class Aelix
     public final static function getAutoloader()
     {
         return self::$autoloader;
+    }
+
+    public final static function getConfig()
+    {
+        return self::$config;
     }
 
     /**
