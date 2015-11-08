@@ -40,11 +40,11 @@ class Aelix
         self::$autoloader->register();
 
         // load database config
-        if (!is_file(DIR_SRC . 'config.php')) {
-            throw new CoreException('Could not find file ' . DIR_SRC . 'config.php!', 0,
-                'Unable to find or open the config file for aelix: ' . DIR_SRC . 'config.php');
+        if (!is_file(DIR_ROOT . 'config.php')) {
+            throw new CoreException('Could not find file ' . DIR_ROOT . 'config.php!', 0,
+                'Unable to find or open the config file for aelix: ' . DIR_ROOT . 'config.php');
         }
-        $config = require_once DIR_SRC . 'config.php';
+        $config = require_once DIR_ROOT . 'config.php';
 
         // init DB
         self::$db = DatabaseFactory::initDatabase(

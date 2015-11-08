@@ -1,3 +1,3 @@
-.idea/
-src/config.php
-logs/*
+/.idea/
+/config.php
+/logs/*
