@@ -12,8 +12,8 @@ use aelix\framework\exception\CoreException;
 
 /**
  * Database configuration
-* @package aelix\framework
-*/
+ * @package aelix\framework
+ */
 class Config
 {
     /**
@@ -33,7 +33,7 @@ class Config
      */
     public function __construct($tableName)
     {
-        if(!preg_match('/[a-zA-Z0-9_-]+/', $tableName)) {
+        if (!preg_match('/[a-zA-Z0-9_-]+/', $tableName)) {
             throw new CoreException('Unacceptable config table name ' . $tableName);
         }
 
@@ -45,9 +45,10 @@ class Config
     {
         $stmt = Aelix::getDB()->query('SELECT * FROM `' . $this->tableName . '`');
 
-        if($stmt->rowCount() > 0) {
+        if ($stmt->rowCount() > 0) {
             foreach ($stmt->fetchAllArray() as $line) {
-                $this->nodes[$line['name']] = new ConfigNode($this, $line['id'], $line['name'], unserialize($line['value']));
+                $this->nodes[$line['name']] = new ConfigNode($this, $line['id'], $line['name'],
+                    unserialize($line['value']));
             }
         }
     }
@@ -67,7 +68,7 @@ class Config
      */
     public function getNode($name)
     {
-        if(!isset($this->nodes[$name])) {
+        if (!isset($this->nodes[$name])) {
             throw new ConfigNodeNotFoundException('Config node ' . $name . ' not found');
         }
 
@@ -82,7 +83,7 @@ class Config
      */
     public function updateNode($name, $value)
     {
-        if(isset($this->nodes[$name])) {
+        if (isset($this->nodes[$name])) {
             $this->nodes[$name]->setValue($value);
         } else {
             $this->addNode($name, $value);
@@ -97,7 +98,7 @@ class Config
      */
     public function addNode($name, $value)
     {
-        if(isset($this->nodes[$name])) {
+        if (isset($this->nodes[$name])) {
             throw new ConfigNodeAlreadyExistsException('Config node ' . $name . ' already exists');
         }
 
