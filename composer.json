@@ -1,0 +1,15 @@
+{
+  "name": "aelix/framework",
+  "description": "Basic PHP framework",
+  "minimum-stability": "stable",
+  "license": "GNU GPL",
+  "authors": [
+    {
+      "name": "aelix framework ",
+      "email": "info@aelix.org"
+    }
+  ],
+  "require": {
+    "twig/twig": "v1.23.1"
+  }
+}

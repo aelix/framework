@@ -49,6 +49,11 @@ class Aelix
         self::$autoloader->addNamespace('aelix\framework', DIR_SRC);
         self::$autoloader->register();
 
+        // also use composer autoloader if necessary
+        if (is_dir(DIR_ROOT . 'vendor') && is_file(DIR_ROOT . 'vendor' . DS . 'autoload.php')) {
+            require_once DIR_ROOT . 'vendor' . DS . 'autoload.php';
+        }
+
         // module loader
         self::$moduleLoader = new ModuleLoader(DIR_ROOT . 'modules' . DS);
         self::$moduleLoader->registerNamespaces();

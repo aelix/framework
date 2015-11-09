@@ -9,6 +9,8 @@
 define('DIR_SRC', dirname(__FILE__) . DS);
 define('DIR_ROOT', dirname(DIR_SRC) . DS);
 
+define('DIR_CACHE', DIR_ROOT . 'cache' . DS);
+
 // debug mode
 define('AELIX_DEBUG', true);
 
