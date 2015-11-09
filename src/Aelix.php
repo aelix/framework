@@ -11,6 +11,7 @@ use aelix\framework\config\Config;
 use aelix\framework\database\DatabaseFactory;
 use aelix\framework\exception\CoreException;
 use aelix\framework\exception\IPrintableException;
+use aelix\framework\module\ModuleLoader;
 
 class Aelix
 {
@@ -31,6 +32,9 @@ class Aelix
     private static $config;
 
     /**
+     * @var module\ModuleLoader
+     */
+    private static $moduleLoader;
      * aelix constructor.
      */
     public final function __construct()
@@ -44,6 +48,11 @@ class Aelix
         self::$autoloader = new Autoloader();
         self::$autoloader->addNamespace('aelix\framework', DIR_SRC);
         self::$autoloader->register();
+
+        // module loader
+        self::$moduleLoader = new ModuleLoader(DIR_ROOT . 'modules' . DS);
+        self::$moduleLoader->registerNamespaces();
+        self::$moduleLoader->load();
 
         // load database config
         if (!is_file(DIR_ROOT . 'config.php')) {

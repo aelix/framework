@@ -44,7 +44,8 @@ class MySQLDatabase extends Database
             $pdo = new PDO($dsn, $username, $password, $options);
         } catch (PDOException $e) {
             // DatabaseException depends on the PDO object, but PDO is not initialized yet. Fall back to CoreException
-            throw new CoreException('Failed to connect to database: ' . $e->getMessage(), $e->getCode(), $e->errorInfo, $e);
+            throw new CoreException('Failed to connect to database: ' . $e->getMessage(), $e->getCode(), $e->errorInfo,
+                $e);
         }
 
         return $pdo;
