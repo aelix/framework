@@ -35,6 +35,13 @@ class Aelix
      * @var module\ModuleLoader
      */
     private static $moduleLoader;
+
+    /**
+     * @var EventHandler
+     */
+    private static $eventHandler;
+
+    /**
      * aelix constructor.
      */
     public final function __construct()
@@ -49,6 +56,10 @@ class Aelix
         self::$autoloader->addNamespace('aelix\framework', DIR_SRC);
         self::$autoloader->register();
 
+        // init event handling
+        self::$eventHandler = new EventHandler();
+
+
         // also use composer autoloader if necessary
         if (is_dir(DIR_ROOT . 'vendor') && is_file(DIR_ROOT . 'vendor' . DS . 'autoload.php')) {
             require_once DIR_ROOT . 'vendor' . DS . 'autoload.php';
@@ -58,6 +69,8 @@ class Aelix
         self::$moduleLoader = new ModuleLoader(DIR_ROOT . 'modules' . DS);
         self::$moduleLoader->registerNamespaces();
         self::$moduleLoader->load();
+
+        Aelix::getEvent()->dispatch('aelix.modules.after_load');
 
         // load database config
         if (!is_file(DIR_ROOT . 'config.php')) {
@@ -79,8 +92,14 @@ class Aelix
         // unset $config for security reasons
         unset($config);
 
+        Aelix::getEvent()->dispatch('aelix.database.after_init');
+
         // boot up configs
         self::$config = new Config('config');
+
+        Aelix::getEvent()->dispatch('aelix.config.after_init');
+
+        Aelix::getEvent()->dispatch('aelix.after_init');
 
     }
 
@@ -141,6 +160,14 @@ class Aelix
     public final static function getDB()
     {
         return self::$db;
+    }
+
+    /**
+     * @return EventHandler
+     */
+    public final static function getEvent()
+    {
+        return self::$eventHandler;
     }
 
     /**
