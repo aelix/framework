@@ -63,7 +63,7 @@ class ModuleLoader
             }
         }
 
-        chdir(DIR_PUBLIC);
+        chdir(DIR_START);
     }
 
     /**

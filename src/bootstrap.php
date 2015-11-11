@@ -26,4 +26,4 @@ ini_set('php.output_encoding', 'UTF-8');
 define('STARTTIME', microtime(true));
 
 require_once DIR_SRC . 'Aelix.php';
-new aelix\framework\Aelix();
+new aelix\framework\Aelix(defined('AELIX_ONLY_INIT'));

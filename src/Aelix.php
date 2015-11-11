@@ -56,8 +56,10 @@ class Aelix
 
     /**
      * aelix constructor.
+     * @param bool|false $initOnly only initialize basic functions, don't output anything (e.g. for migrations)
+     * @throws CoreException
      */
-    public final function __construct()
+    public final function __construct($initOnly = false)
     {
         // register error and exception handler
         set_exception_handler(['\aelix\framework\Aelix', 'handleException']);
@@ -104,6 +106,11 @@ class Aelix
         // unset $config for security reasons
         unset($config);
         Aelix::getEvent()->dispatch('aelix.database.init');
+
+        if ($initOnly) {
+            // basic init is done, abort
+            return;
+        }
 
         // boot up configs
         self::$config = new Config('config');

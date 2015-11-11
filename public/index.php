@@ -7,5 +7,6 @@
 
 define('DS', DIRECTORY_SEPARATOR);
 define('DIR_PUBLIC', dirname(__FILE__) . DS);
+define('DIR_START', dirname(__FILE__) . DS); // from where we started the execution
 
 require '..' . DS . 'src' . DS . 'bootstrap.php';

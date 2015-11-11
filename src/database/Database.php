@@ -16,6 +16,11 @@ abstract class Database
     protected $pdo;
 
     /**
+     * @var string
+     */
+    protected $databaseName;
+
+    /**
      * @param string $host SQL server's hostname/IP or file name
      * @param string $username username for login
      * @param string $password password for login
@@ -24,6 +29,7 @@ abstract class Database
      */
     public function __construct($host = '', $username = '', $password = '', $database = '', $port = 0)
     {
+        $this->databaseName = $database;
         $this->pdo = $this->connect($host, $username, $password, $database, $port);
     }
 
@@ -101,6 +107,14 @@ abstract class Database
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDatabaseName()
+    {
+        return $this->databaseName;
     }
 
 }
