@@ -26,15 +26,20 @@ class EventHandler
      * @param string $hook
      * @param array $args
      */
-    public function dispatch($hook, array $args = []) {
+    public function dispatch($hook, array $args = [])
+    {
         if (isset($this->events[$hook])) {
             // additional call parameters
             //$args = func_get_args();
             //array_shift($args);
             // sort listeners
-            usort($this->events[$hook], function($a, $b) {
-                if ($a[1] > $b[1] && $a[1] != 0) return -1;
-                if ($a[1] < $b[1] && $b[1] != 0) return 1;
+            usort($this->events[$hook], function ($a, $b) {
+                if ($a[1] > $b[1] && $a[1] != 0) {
+                    return -1;
+                }
+                if ($a[1] < $b[1] && $b[1] != 0) {
+                    return 1;
+                }
                 return 0;
             });
             // call the registered functions
