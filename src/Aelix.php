@@ -12,6 +12,8 @@ use aelix\framework\database\DatabaseFactory;
 use aelix\framework\exception\CoreException;
 use aelix\framework\exception\IPrintableException;
 use aelix\framework\module\ModuleLoader;
+use aelix\framework\template\ITemplateEngine;
+use aelix\framework\template\TemplateEngineFactory;
 
 class Aelix
 {
@@ -42,6 +44,10 @@ class Aelix
     private static $eventHandler;
 
     /**
+    /**
+     * @var ITemplateEngine
+     */
+    private static $templateEngine;
      * aelix constructor.
      */
     public final function __construct()
@@ -139,6 +145,27 @@ class Aelix
             }
             throw new CoreException('PHP ' . $type . ' in file ' . $filename . ' (' . $lineNo . '): ' . $message, 0);
         }
+    }
+
+    /**
+     * @param string $engine template engine name
+     * @param array $directories template file search directories
+     * @param bool|true $caching caching enabled?
+     * @return ITemplateEngine
+     * @throws CoreException
+     */
+    public final static function initTemplateEngine($engine, $directories = [], $caching = true)
+    {
+        self::$templateEngine = TemplateEngineFactory::initTemplateEngine($engine, $directories, $caching);
+        return self::$templateEngine;
+    }
+
+    /**
+     * @return ITemplateEngine
+     */
+    public static function getTemplateEngine()
+    {
+        return self::$templateEngine;
     }
 
     /**

@@ -9,12 +9,13 @@ namespace aelix\framework\config;
 
 use aelix\framework\Aelix;
 use aelix\framework\exception\CoreException;
+use aelix\framework\template\ITemplatable;
 
 /**
  * Database configuration
  * @package aelix\framework
  */
-class Config
+class Config implements ITemplatable
 {
     /**
      * @var string
@@ -112,5 +113,20 @@ class Config
 
         $this->nodes[$name] = $node;
         return $node;
+    }
+
+    /**
+     * get an associative array suitable for assigning to template variables
+     * @return array
+     */
+    public function getTemplateArray()
+    {
+        $temp = [];
+
+        foreach ($this->nodes as $node) {
+            $temp[$node->getName()] = $node->getValue();
+        }
+
+        return $temp;
     }
 }

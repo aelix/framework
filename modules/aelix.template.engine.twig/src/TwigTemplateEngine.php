@@ -9,10 +9,14 @@ namespace aelix\framework\template\engine;
 
 
 use aelix\framework\Aelix;
+use aelix\framework\template\ITemplatable;
 use aelix\framework\template\ITemplateEngine;
 
 class TwigTemplateEngine implements ITemplateEngine
 {
+
+    const DEFAULT_EXTENSION = '.twig';
+
     /**
      * template search directories
      * @var array
@@ -70,6 +74,7 @@ class TwigTemplateEngine implements ITemplateEngine
      * add a directory to template search dirs
      * @param string $directory
      * @param bool|true $primary
+     * @return ITemplateEngine|void
      */
     public function addDir($directory, $primary = true)
     {
@@ -80,21 +85,17 @@ class TwigTemplateEngine implements ITemplateEngine
         }
 
         $this->twigEnv->setLoader($this->twigLoader);
+
+        return $this;
     }
 
-    /**
-     * @param array $variables
-     */
-    public function assign($variables)
-    {
-        $this->variables = $variables;
-    }
+
 
     /**
      * is this template engine supported on this platform?
      * @return bool
      */
-    public function isSupported()
+    public static function isSupported()
     {
         // twig needs to be loaded via composer
         return class_exists('Twig_Environment', true);
@@ -103,19 +104,65 @@ class TwigTemplateEngine implements ITemplateEngine
     /**
      * display the template
      * @param string $template template name
+     * @param bool $defaultExtension if to use the default template engine's file extension for template files
+     * @return ITemplateEngine
      */
-    public function display($template)
+    public function display($template, $defaultExtension = false)
     {
-        $this->twigEnv->display($template, $this->variables);
+        $this->twigEnv->display($template . ($defaultExtension ? self::DEFAULT_EXTENSION : ''), $this->variables);
+        return $this;
     }
 
     /**
      * parse the template and return it as string
      * @param string $template template name
+     * @param bool $defaultExtension if to use the default template engine's file extension for template files
      * @return string
      */
-    public function parse($template)
+    public function parse($template, $defaultExtension = false)
     {
-        return $this->twigEnv->render($template, $this->variables);
+        return $this->twigEnv->render($template . ($defaultExtension ? self::DEFAULT_EXTENSION : ''), $this->variables);
+    }
+
+    /**
+     * assign template variables
+     * if objects of type ITemplatable are used in the array, these will be converted to their getTemplateArray()
+     * value
+     * @param array|ITemplatable[] $variables
+     * @param bool $merge
+     * @return ITemplateEngine
+     */
+    public function assign(array $variables, $merge = false)
+    {
+        if ($merge) {
+            // if key is in first array, keep it
+            // we keep existing but overwrite with new
+            $this->variables = $this->convertVariables($variables) + $this->variables;
+        } else {
+            $this->variables = $this->convertVariables($variables);
+        }
+
+        return $this;
+    }
+
+    /**
+     * replaces ITemplatable objects with its output for template assigning
+     * @param array $variables
+     * @return array
+     */
+    protected function convertVariables(array $variables) {
+        $temp = [];
+
+        foreach ($variables as $key => $var) {
+            if (is_array($var)) {
+                $temp[$key] = $this->convertVariables($var);
+            } elseif ($var instanceof ITemplatable) {
+                $temp[$key] = $var->getTemplateArray();
+            } else {
+                $temp[$key] = $var;
+            }
+        }
+
+        return $temp;
     }
 }
