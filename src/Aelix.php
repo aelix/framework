@@ -12,6 +12,7 @@ use aelix\framework\database\DatabaseFactory;
 use aelix\framework\exception\CoreException;
 use aelix\framework\exception\IPrintableException;
 use aelix\framework\module\ModuleLoader;
+use aelix\framework\route\Router;
 use aelix\framework\template\ITemplateEngine;
 use aelix\framework\template\TemplateEngineFactory;
 
@@ -44,10 +45,16 @@ class Aelix
     private static $eventHandler;
 
     /**
+     * @var Router
+     */
+    private static $router;
+
     /**
      * @var ITemplateEngine
      */
     private static $templateEngine;
+
+    /**
      * aelix constructor.
      */
     public final function __construct()
@@ -75,8 +82,7 @@ class Aelix
         self::$moduleLoader = new ModuleLoader(DIR_ROOT . 'modules' . DS);
         self::$moduleLoader->registerNamespaces();
         self::$moduleLoader->load();
-
-        Aelix::getEvent()->dispatch('aelix.modules.after_load');
+        Aelix::getEvent()->dispatch('aelix.modules.load');
 
         // load database config
         if (!is_file(DIR_ROOT . 'config.php')) {
@@ -97,15 +103,18 @@ class Aelix
 
         // unset $config for security reasons
         unset($config);
-
-        Aelix::getEvent()->dispatch('aelix.database.after_init');
+        Aelix::getEvent()->dispatch('aelix.database.init');
 
         // boot up configs
         self::$config = new Config('config');
+        Aelix::getEvent()->dispatch('aelix.config.init');
 
-        Aelix::getEvent()->dispatch('aelix.config.after_init');
+        // launch routes
+        self::$router = new Router(); // make basepath configurable
+        Aelix::getEvent()->dispatch('aelix.router.register');
 
-        Aelix::getEvent()->dispatch('aelix.after_init');
+        self::$router->matchCurrentRequest()->dispatch();
+        Aelix::getEvent()->dispatch('aelix.router.dispatch');
 
     }
 
@@ -176,6 +185,9 @@ class Aelix
         return self::$autoloader;
     }
 
+    /**
+     * @return Config
+     */
     public final static function getConfig()
     {
         return self::$config;
@@ -195,6 +207,14 @@ class Aelix
     public final static function getEvent()
     {
         return self::$eventHandler;
+    }
+
+    /**
+     * @return Router
+     */
+    public final static function getRouter()
+    {
+        return self::$router;
     }
 
     /**
