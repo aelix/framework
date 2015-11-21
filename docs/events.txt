@@ -5,3 +5,4 @@ aelix.database.init             none                    After database init
 aelix.config.init               none                    After database configuration init
 aelix.router.register           none                    After registering the router (define your routes after this)
 aelix.router.dispatch           none                    After dispatching the controller for current request
+aelix.router.no_route           none                    Called when there's no route matching the current request (404)

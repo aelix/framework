@@ -15,6 +15,7 @@ use aelix\framework\module\ModuleLoader;
 use aelix\framework\route\Router;
 use aelix\framework\template\ITemplateEngine;
 use aelix\framework\template\TemplateEngineFactory;
+use aelix\framework\user\User;
 
 class Aelix
 {
@@ -120,7 +121,12 @@ class Aelix
         self::$router = new Router(); // make basepath configurable
         Aelix::getEvent()->dispatch('aelix.router.register');
 
-        self::$router->matchCurrentRequest()->dispatch();
+        $match = self::$router->matchCurrentRequest();
+        if ($match === false) {
+            Aelix::getEvent()->dispatch('aelix.router.no_route');
+        } else {
+            $match->dispatch();
+        }
         Aelix::getEvent()->dispatch('aelix.router.dispatch');
 
     }
