@@ -47,9 +47,9 @@ class DatabaseException extends CoreException
     /**
      * @param string $message
      * @param Database $db
-     * @param \PDOStatement|null $statement
+     * @param DatabaseStatement|null $statement
      */
-    public function __construct($message, Database $db, \PDOStatement $statement = null)
+    public function __construct($message, Database $db, DatabaseStatement $statement = null)
     {
         $this->db = $db;
         $this->statement = $statement;
@@ -100,6 +100,11 @@ class DatabaseException extends CoreException
 
     public function show()
     {
+        // debugDumpParams() can only output, need to catch that
+        ob_start();
+        $this->statement->debugDumpParams();
+        $debugDumpParams = ob_get_clean();
+
         // Put it into the information var
         $this->information .= '<strong>SQL type:</strong> ' . UString::encodeHTML($this->dbDriverName) . '<br>' . NL;
         $this->information .= '<strong>SQL error number:</strong> ' . UString::encodeHTML($this->sqlErrorCode) . '<br>' . NL;
@@ -108,7 +113,7 @@ class DatabaseException extends CoreException
 
         // Do we have some additional query stuff?
         if ($this->statement !== null) {
-            $this->information .= '<strong>SQL query:</strong> ' . UString::encodeHTML($this->statement->debugDumpParams()) . '<br>' . NL;
+            $this->information .= '<strong>SQL query:</strong> ' . UString::encodeHTML($debugDumpParams) . '<br>' . NL;
         }
         parent::show();
     }

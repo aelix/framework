@@ -94,7 +94,7 @@ class DatabaseStatement
     public function __call($name, $arguments)
     {
         try {
-            return call_user_func([$this->pdoStatement, $name], empty($arguments ? null : $arguments));
+            return call_user_func_array([$this->pdoStatement, $name], $arguments);
         } catch (\PDOException $e) {
             throw new DatabaseException($e->getMessage(), $this->database, $this);
         }
