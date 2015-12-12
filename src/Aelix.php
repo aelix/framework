@@ -13,6 +13,8 @@ use aelix\framework\exception\CoreException;
 use aelix\framework\exception\IPrintableException;
 use aelix\framework\module\ModuleLoader;
 use aelix\framework\route\Router;
+use aelix\framework\session\handler\DatabaseSessionHandler;
+use aelix\framework\session\Session;
 use aelix\framework\template\ITemplateEngine;
 use aelix\framework\template\TemplateEngineFactory;
 use aelix\framework\user\User;
@@ -56,6 +58,16 @@ class Aelix
     private static $templateEngine;
 
     /**
+     * @var Session
+     */
+    private static $session;
+
+    /**
+     * @var User
+     */
+    private static $user;
+
+    /**
      * aelix constructor.
      * @param bool|false $initOnly only initialize basic functions, don't output anything (e.g. for migrations)
      * @throws CoreException
@@ -85,7 +97,7 @@ class Aelix
         self::$moduleLoader = new ModuleLoader(DIR_ROOT . 'modules' . DS);
         self::$moduleLoader->registerNamespaces();
         self::$moduleLoader->load();
-        Aelix::getEvent()->dispatch('aelix.modules.load');
+        Aelix::event()->dispatch('aelix.modules.load');
 
         // load database config
         if (!is_file(DIR_ROOT . 'config.php')) {
@@ -106,7 +118,7 @@ class Aelix
 
         // unset $config for security reasons
         unset($config);
-        Aelix::getEvent()->dispatch('aelix.database.init');
+        Aelix::event()->dispatch('aelix.database.init');
 
         if ($initOnly) {
             // basic init is done, abort
@@ -115,20 +127,33 @@ class Aelix
 
         // boot up configs
         self::$config = new Config('config');
-        Aelix::getEvent()->dispatch('aelix.config.init');
+        Aelix::event()->dispatch('aelix.config.init');
 
         // launch routes
         self::$router = new Router(); // make basepath configurable
-        Aelix::getEvent()->dispatch('aelix.router.register');
+        Aelix::event()->dispatch('aelix.router.register');
 
+        // init session
+        self::$session = new Session(
+            new DatabaseSessionHandler(self::$db, 'session'),
+            self::config()->get('core.session.max_lifetime'),
+            self::config()->get('core.session.gc_probability'),
+            self::config()->get('core.session.cookie_lifetime'),
+            self::config()->get('core.session.cookie_name'));
+        Aelix::event()->dispatch('aelix.session.init');
+
+        // who's there?
+        self::$user = self::$session->getUser();
+        Aelix::event()->dispatch('aelix.user.init');
+
+        // fire router
         $match = self::$router->matchCurrentRequest();
         if ($match === false) {
-            Aelix::getEvent()->dispatch('aelix.router.no_route');
+            Aelix::event()->dispatch('aelix.router.no_route');
         } else {
             $match->dispatch();
         }
-        Aelix::getEvent()->dispatch('aelix.router.dispatch');
-
+        Aelix::event()->dispatch('aelix.router.dispatch');
     }
 
     /**
@@ -185,7 +210,7 @@ class Aelix
     /**
      * @return ITemplateEngine
      */
-    public static function getTemplateEngine()
+    public static function templateEngine()
     {
         return self::$templateEngine;
     }
@@ -193,7 +218,7 @@ class Aelix
     /**
      * @return Autoloader
      */
-    public final static function getAutoloader()
+    public final static function autoloader()
     {
         return self::$autoloader;
     }
@@ -201,7 +226,7 @@ class Aelix
     /**
      * @return Config
      */
-    public final static function getConfig()
+    public final static function config()
     {
         return self::$config;
     }
@@ -209,7 +234,7 @@ class Aelix
     /**
      * @return database\Database
      */
-    public final static function getDB()
+    public final static function db()
     {
         return self::$db;
     }
@@ -217,7 +242,7 @@ class Aelix
     /**
      * @return EventHandler
      */
-    public final static function getEvent()
+    public final static function event()
     {
         return self::$eventHandler;
     }
@@ -225,9 +250,25 @@ class Aelix
     /**
      * @return Router
      */
-    public final static function getRouter()
+    public final static function router()
     {
         return self::$router;
+    }
+
+    /**
+     * @return Session
+     */
+    public static function session()
+    {
+        return self::$session;
+    }
+
+    /**
+     * @return User
+     */
+    public static function user()
+    {
+        return self::$user;
     }
 
     /**

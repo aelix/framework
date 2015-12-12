@@ -44,7 +44,7 @@ class UserDataField
     public function setName($name)
     {
         $this->name = $name;
-        Aelix::getDB()->prepare('UPDATE `user_data_field` SET `fieldName` = :name WHERE `id` = :id')
+        Aelix::db()->prepare('UPDATE `user_data_field` SET `fieldName` = :name WHERE `id` = :id')
             ->execute([
                 ':name' => $this->name,
                 ':id' => $this->id
@@ -79,7 +79,7 @@ class UserDataField
             return self::$fields[$fieldName];
         } else {
             // search in DB
-            $stmt = Aelix::getDB()->prepare('SELECT * FROM `user_data_field` WHERE `fieldName` = :fieldName')
+            $stmt = Aelix::db()->prepare('SELECT * FROM `user_data_field` WHERE `fieldName` = :fieldName')
                 ->execute([
                     ':fieldName' => $fieldName
                 ]);
@@ -110,7 +110,7 @@ class UserDataField
         }
 
         // find in DB
-        $rowCount = Aelix::getDB()->prepare('SELECT * FROM `user_data_field` WHERE `fieldName` = :fieldName')
+        $rowCount = Aelix::db()->prepare('SELECT * FROM `user_data_field` WHERE `fieldName` = :fieldName')
             ->execute([
                 ':fieldName' => $fieldName
             ])
@@ -122,11 +122,11 @@ class UserDataField
         }
 
         // create a new one
-        Aelix::getDB()->prepare('INSERT INTO `user_data_field` SET `fieldName` = :fieldName')
+        Aelix::db()->prepare('INSERT INTO `user_data_field` SET `fieldName` = :fieldName')
             ->execute([
                 ':fieldName' => $fieldName
             ]);
-        $fieldID = Aelix::getDB()->getPDO()->lastInsertId('user_data_field');
+        $fieldID = Aelix::db()->getPDO()->lastInsertId('user_data_field');
 
         $obj = new UserDataField($fieldID, $fieldName);
         self::$fields[$fieldName] = $obj;

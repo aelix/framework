@@ -9,9 +9,10 @@ namespace aelix\framework\user;
 
 
 use aelix\framework\Aelix;
+use aelix\framework\template\ITemplatable;
 use aelix\framework\util\USecurity;
 
-class User
+class User implements ITemplatable
 {
     /**
      * Cache for constructors
@@ -69,7 +70,7 @@ class User
      */
     protected function loadUserData()
     {
-        $stmt = Aelix::getDB()->prepare(
+        $stmt = Aelix::db()->prepare(
             'SELECT
                 `user_data`.`id` AS `dataID`,
                 `user_data`.`value`,
@@ -181,7 +182,7 @@ class User
     {
         $hash = USecurity::encryptPassword($password, $hashCost);
 
-        Aelix::getDB()->prepare('UPDATE `user` SET `passwordHash` = :hash WHERE `id` = :id')
+        Aelix::db()->prepare('UPDATE `user` SET `passwordHash` = :hash WHERE `id` = :id')
             ->execute([
                 ':hash' => $hash,
                 ':id' => $this->id
@@ -191,20 +192,20 @@ class User
     /**
      * @param int $userID
      * @return User
-     * @throws \InvalidArgumentException
+     * @throws UserDoesntExistException
      */
     public static function getByID($userID)
     {
         if (isset(self::$userByID[$userID]) && self::$userByID[$userID] instanceof User) {
             return self::$userByID[$userID];
         } else {
-            $stmt = Aelix::getDB()->prepare('SELECT * FROM `user` WHERE `id` = :userID')
+            $stmt = Aelix::db()->prepare('SELECT * FROM `user` WHERE `id` = :userID')
                 ->execute([
                     ':userID' => $userID
                 ]);
 
             if ($stmt->rowCount() != 1) {
-                throw new \InvalidArgumentException('User ID ' . $userID . ' does not exist.');
+                throw new UserDoesntExistException();
             }
 
             $user = new User($stmt->fetchArray());
@@ -225,7 +226,7 @@ class User
     {
         $passwordHash = USecurity::encryptPassword($password, $hashCost);
 
-        Aelix::getDB()->prepare('INSERT INTO `user` SET
+        Aelix::db()->prepare('INSERT INTO `user` SET
             `username` = :username,
             `email` = :email,
             `passwordHash` = :passwordHash,
@@ -237,7 +238,7 @@ class User
                 ':fullname' => $fullname
             ]);
 
-        $userID = Aelix::getDB()->getPDO()->lastInsertId('user');
+        $userID = Aelix::db()->getPDO()->lastInsertId('user');
 
         $user = new User([
             'id' => $userID,
@@ -249,5 +250,28 @@ class User
 
         self::$userByID[$userID] = $user;
         return $user;
+    }
+
+    /**
+     * get an associative array suitable for assigning to template variables
+     * @return array
+     */
+    public function getTemplateArray()
+    {
+        $data = [];
+        if ($this->data) {
+            foreach ($this->data as $key => $value) {
+                $data[$key] = $value->getValue();
+            }
+        }
+
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'fullname' => $this->fullname,
+            'email' => $this->email,
+            'passwordNeedsRehash' => $this->checkPasswordSecurity(),
+            'data' => $data
+        ];
     }
 }

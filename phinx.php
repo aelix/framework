@@ -32,8 +32,8 @@ return [
         'default_migration_table' => 'phinxlog',
         'default_database' => 'aelix',
         'aelix' => [
-            'name' => Aelix::getDB()->getDatabaseName(),
-            'connection' => Aelix::getDB()->getPDO()
+            'name' => Aelix::db()->getDatabaseName(),
+            'connection' => Aelix::db()->getPDO()
         ],
     ]
 ];

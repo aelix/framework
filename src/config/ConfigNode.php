@@ -69,7 +69,7 @@ class ConfigNode
     {
         $this->value = $value;
 
-        $stmt = Aelix::getDB()->prepare('UPDATE `' . $this->config->getTableName() . '` SET `value` = :value WHERE `id` = :id');
+        $stmt = Aelix::db()->prepare('UPDATE `' . $this->config->getTableName() . '` SET `value` = :value WHERE `id` = :id');
         $stmt->execute([
             ':id' => $this->id,
             ':value' => serialize($this->value)

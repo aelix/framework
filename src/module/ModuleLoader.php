@@ -55,10 +55,10 @@ class ModuleLoader
             foreach ($module->getNamespaces() as $namespace => $dir) {
                 if (is_array($dir)) {
                     foreach ($dir as $curDir) {
-                        Aelix::getAutoloader()->addNamespace($namespace, realpath($curDir));
+                        Aelix::autoloader()->addNamespace($namespace, realpath($curDir));
                     }
                 } elseif (is_string($dir)) {
-                    Aelix::getAutoloader()->addNamespace($namespace, realpath($dir));
+                    Aelix::autoloader()->addNamespace($namespace, realpath($dir));
                 }
             }
         }

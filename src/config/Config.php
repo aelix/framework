@@ -44,7 +44,7 @@ class Config implements ITemplatable
 
     public function updateAll()
     {
-        $stmt = Aelix::getDB()->query('SELECT * FROM `' . $this->tableName . '`');
+        $stmt = Aelix::db()->query('SELECT * FROM `' . $this->tableName . '`');
 
         if ($stmt->rowCount() > 0) {
             foreach ($stmt->fetchAllArray() as $line) {
@@ -64,16 +64,16 @@ class Config implements ITemplatable
 
     /**
      * @param $name
-     * @return ConfigNode
+     * @return mixed
      * @throws ConfigNodeNotFoundException
      */
-    public function getNode($name)
+    public function get($name)
     {
         if (!isset($this->nodes[$name])) {
             throw new ConfigNodeNotFoundException('Config node ' . $name . ' not found');
         }
 
-        return $this->nodes[$name];
+        return $this->nodes[$name]->getValue();
     }
 
 
@@ -82,12 +82,12 @@ class Config implements ITemplatable
      * @param $name
      * @param $value
      */
-    public function updateNode($name, $value)
+    public function update($name, $value)
     {
         if (isset($this->nodes[$name])) {
             $this->nodes[$name]->setValue($value);
         } else {
-            $this->addNode($name, $value);
+            $this->add($name, $value);
         }
     }
 
@@ -97,19 +97,19 @@ class Config implements ITemplatable
      * @return ConfigNode
      * @throws ConfigNodeAlreadyExistsException
      */
-    public function addNode($name, $value)
+    public function add($name, $value)
     {
         if (isset($this->nodes[$name])) {
             throw new ConfigNodeAlreadyExistsException('Config node ' . $name . ' already exists');
         }
 
-        $stmt = Aelix::getDB()->prepare('INSERT INTO `' . $this->tableName . '` SET `name` = :name, `value` = :value');
+        $stmt = Aelix::db()->prepare('INSERT INTO `' . $this->tableName . '` SET `name` = :name, `value` = :value');
         $stmt->execute([
             ':name' => $name,
             ':value' => serialize($value)
         ]);
 
-        $node = new ConfigNode($this, Aelix::getDB()->getPDO()->lastInsertId($this->tableName), $name, $value);
+        $node = new ConfigNode($this, Aelix::db()->getPDO()->lastInsertId($this->tableName), $name, $value);
 
         $this->nodes[$name] = $node;
         return $node;

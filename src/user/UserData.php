@@ -53,7 +53,7 @@ class UserData
     public function setValue($value)
     {
         $this->value = $value;
-        Aelix::getDB()->prepare('UPDATE `user_data` SET `value` = :value WHERE `id` = :id')
+        Aelix::db()->prepare('UPDATE `user_data` SET `value` = :value WHERE `id` = :id')
             ->execute([
                 ':value' => serialize($this->value),
                 ':id' => $this->id
@@ -109,7 +109,7 @@ class UserData
 
         $value = serialize($value);
 
-        Aelix::getDB()->prepare('INSERT INTO `user_data`
+        Aelix::db()->prepare('INSERT INTO `user_data`
             SET `userID` = :userID, `fieldID` = :fieldID, `value` = :value')
             ->execute([
                 ':userID' => $user->getID(),
@@ -120,7 +120,7 @@ class UserData
                  */
             ]);
 
-        $dataID = Aelix::getDB()->getPDO()->lastInsertId('user_data');
+        $dataID = Aelix::db()->getPDO()->lastInsertId('user_data');
 
         return new UserData($user, $field, $dataID, $value);
     }
