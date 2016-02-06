@@ -69,13 +69,22 @@ class Config implements ITemplatable
      */
     public function get($name)
     {
+        return $this->getNode($name)->getValue();
+    }
+
+    /**
+     * @param $name
+     * @return ConfigNode
+     * @throws ConfigNodeNotFoundException
+     */
+    public function getNode($name)
+    {
         if (!isset($this->nodes[$name])) {
             throw new ConfigNodeNotFoundException('Config node ' . $name . ' not found');
         }
 
-        return $this->nodes[$name]->getValue();
+        return $this->nodes[$name];
     }
-
 
     /**
      * Update existing node or create a new
