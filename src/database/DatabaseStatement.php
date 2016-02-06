@@ -145,6 +145,17 @@ class DatabaseStatement
     }
 
     /**
+     * Get id of last inserted row
+     * @see \PDO::lastInsertId()
+     * @param null $table
+     * @return string
+     */
+    public function getLastInsertID($table = null)
+    {
+        return $this->database->getPDO()->lastInsertId($table);
+    }
+
+    /**
      * @return string
      */
     public function getErrorDescription()
