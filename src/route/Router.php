@@ -39,6 +39,19 @@ class Router
         }
     }
 
+    /**
+     * @see \aelix\framework\route\Route::__construct()
+     * @param string|array $method
+     * @param string $url
+     * @param callable $handler
+     * @return $this
+     */
+    public function map($method, $url, callable $handler)
+    {
+        $this->routeCollection->add(new Route($method, $url, $handler));
+        return $this;
+    }
+
     public function matchCurrentRequest()
     {
         $requestMethod = $_SERVER['REQUEST_METHOD'];
