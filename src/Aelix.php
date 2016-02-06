@@ -158,9 +158,9 @@ class Aelix
 
     /**
      * show exceptions
-     * @param \Exception $e
+     * @param \Throwable $e
      */
-    public final static function handleException(\Exception $e)
+    public final static function handleException(\Throwable $e)
     {
         if ($e instanceof IPrintableException) {
             $e->show();

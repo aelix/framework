@@ -14,7 +14,7 @@ use aelix\framework\util\UString;
 class CoreException extends LoggedException implements IPrintableException
 {
 
-    public function __construct($message = '', $code = 0, $description = '', \Exception $previous = null)
+    public function __construct($message = '', $code = 0, $description = '', \Throwable $previous = null)
     {
         parent::__construct((string)$message, (int)$code, $previous);
         $this->description = $description;
