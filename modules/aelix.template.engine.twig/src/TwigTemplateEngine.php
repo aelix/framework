@@ -165,4 +165,11 @@ class TwigTemplateEngine implements ITemplateEngine
 
         return $temp;
     }
+
+    /**
+     * @param \Twig_ExtensionInterface $extension
+     */
+    public function registerExtension(\Twig_ExtensionInterface $extension) {
+        $this->twigEnv->addExtension($extension);
+    }
 }
