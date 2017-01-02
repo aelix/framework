@@ -38,12 +38,18 @@ class Route
     protected $parameters;
 
     /**
+     * name of this route (for reverse building)
+     * @var string
+     */
+    protected $name;
+
+    /**
      * Route constructor.
      * @param string|array $methods
      * @param string $url
      * @param callable $handler
      */
-    public function __construct($methods, $url, callable $handler)
+    public function __construct(string $name, $methods, string $url, callable $handler)
     {
         // check methods and set
         if (is_array($methods)) {
@@ -63,12 +69,13 @@ class Route
         // remove last slash
         $this->url = ($url = '/' ? $url : rtrim($url, '/'));
         $this->handler = $handler;
+        $this->name = $name;
     }
 
     /**
      * @return string
      */
-    public function getRegex()
+    public function getRegex(): string
     {
         return preg_replace('/(:\w+)/', '([\w-%]+)', $this->url);
     }
@@ -76,7 +83,7 @@ class Route
     /**
      * @return array
      */
-    public function getMethods()
+    public function getMethods(): array
     {
         return $this->methods;
     }
@@ -84,25 +91,37 @@ class Route
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
 
     /**
      * @param array $parameters
+     * @return Route
      */
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): Route
     {
         $this->parameters = $parameters;
+        return $this;
     }
 
     /**
      * fire registered handler
+     * @return Route
      */
-    public function dispatch()
+    public function dispatch(): Route
     {
         call_user_func_array($this->handler, $this->parameters);
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
 }
