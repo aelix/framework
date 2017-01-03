@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\template\extension;
 
@@ -26,7 +27,8 @@ class Twig_AelixNavigation extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('generate_navigation', [$this, 'function_generateNavigation'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('generate_navigation', [$this, 'function_generateNavigation'],
+                ['is_safe' => ['html']]),
         ];
     }
 
@@ -35,8 +37,9 @@ class Twig_AelixNavigation extends \Twig_Extension
      * @param array $templateArray array for the navigation
      * @return string
      */
-    public function function_generateNavigation($templateArray) {
-        $output = '<ul>'.NL;
+    public function function_generateNavigation($templateArray)
+    {
+        $output = '<ul>' . NL;
 
         foreach ($templateArray['entries'] as $entry) {
             if ($entry['active'] === true) {
@@ -55,7 +58,7 @@ class Twig_AelixNavigation extends \Twig_Extension
                 $output .= '</a>';
             }
 
-            $output .= '</li>'.NL;
+            $output .= '</li>' . NL;
         }
 
         $output .= '</ul>';

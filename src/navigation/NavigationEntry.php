@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\navigation;
 
@@ -40,7 +41,7 @@ class NavigationEntry implements ITemplatable
      * @param string $url
      * @param bool $active
      */
-    public function __construct($key, $name, $url, $active = false)
+    public function __construct(string $key, string $name, string $url, bool $active = false)
     {
         $this->key = $key;
         $this->name = $name;
@@ -49,65 +50,9 @@ class NavigationEntry implements ITemplatable
     }
 
     /**
-     * @return string
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    /**
-     * @param string $url
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isActive()
-    {
-        return $this->active;
-    }
-
-    /**
-     * @param bool $active
-     */
-    public function setActive($active = true)
-    {
-        $this->active = $active;
-    }
-
-    /**
      * @return array
      */
-    public function getTemplateArray()
+    public function getTemplateArray(): array
     {
         return [
             'key' => $this->getKey(),
@@ -115,6 +60,68 @@ class NavigationEntry implements ITemplatable
             'name' => $this->getName(),
             'active' => $this->isActive()
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     * @return NavigationEntry
+     */
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return NavigationEntry
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     * @return NavigationEntry
+     */
+    public function setActive(bool $active = true): self
+    {
+        $this->active = $active;
+        return $this;
     }
 
 

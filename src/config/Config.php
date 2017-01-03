@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\config;
 
@@ -29,10 +30,10 @@ class Config implements ITemplatable
 
     /**
      * Config constructor.
-     * @param $tableName
+     * @param string $tableName
      * @throws CoreException
      */
-    public function __construct($tableName)
+    public function __construct(string $tableName)
     {
         if (!preg_match('/[a-zA-Z0-9_-]+/', $tableName)) {
             throw new CoreException('Unacceptable config table name ' . $tableName);
@@ -42,7 +43,11 @@ class Config implements ITemplatable
         $this->updateAll();
     }
 
-    public function updateAll()
+    /**
+     * reads all Config nodes from the DB
+     * @return Config
+     */
+    public function updateAll(): self
     {
         $stmt = Aelix::db()->query('SELECT * FROM `' . $this->tableName . '`');
 
@@ -52,32 +57,34 @@ class Config implements ITemplatable
                     unserialize($line['value']));
             }
         }
+
+        return $this;
     }
 
     /**
      * @return string
      */
-    public function getTableName()
+    public function getTableName(): string
     {
         return $this->tableName;
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return mixed
      * @throws ConfigNodeNotFoundException
      */
-    public function get($name)
+    public function get(string $name)
     {
         return $this->getNode($name)->getValue();
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return ConfigNode
      * @throws ConfigNodeNotFoundException
      */
-    public function getNode($name)
+    public function getNode(string $name): ConfigNode
     {
         if (!isset($this->nodes[$name])) {
             throw new ConfigNodeNotFoundException('Config node ' . $name . ' not found');
@@ -88,25 +95,28 @@ class Config implements ITemplatable
 
     /**
      * Update existing node or create a new
-     * @param $name
-     * @param $value
+     * @param string $name
+     * @param mixed $value
+     * @return Config
      */
-    public function update($name, $value)
+    public function update(string $name, $value): self
     {
         if (isset($this->nodes[$name])) {
             $this->nodes[$name]->setValue($value);
         } else {
             $this->add($name, $value);
         }
+
+        return $this;
     }
 
     /**
-     * @param $name
-     * @param $value
-     * @return ConfigNode
+     * @param string $name
+     * @param mixed $value
+     * @return Config
      * @throws ConfigNodeAlreadyExistsException
      */
-    public function add($name, $value)
+    public function add(string $name, $value): self
     {
         if (isset($this->nodes[$name])) {
             throw new ConfigNodeAlreadyExistsException('Config node ' . $name . ' already exists');
@@ -121,14 +131,14 @@ class Config implements ITemplatable
         $node = new ConfigNode($this, Aelix::db()->getPDO()->lastInsertId($this->tableName), $name, $value);
 
         $this->nodes[$name] = $node;
-        return $node;
+        return $this;
     }
 
     /**
      * get an associative array suitable for assigning to template variables
      * @return array
      */
-    public function getTemplateArray()
+    public function getTemplateArray(): array
     {
         $temp = [];
 

@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\database;
 
@@ -13,8 +14,24 @@ use aelix\framework\exception\CoreException;
 class DatabaseFactory
 {
 
-    public static function initDatabase($driver, $host, $user, $password, $database, $port)
-    {
+    /**
+     * @param string $driver
+     * @param string $host
+     * @param string $user
+     * @param string $password
+     * @param string $database
+     * @param int $port
+     * @return Database
+     * @throws CoreException
+     */
+    public static function initDatabase(
+        string $driver,
+        string $host,
+        string $user,
+        string $password,
+        string $database,
+        int $port
+    ): Database {
 
         $driverClass = '\aelix\framework\database\driver\\' . $driver . 'Database';
 

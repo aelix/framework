@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\user;
 
@@ -67,8 +68,9 @@ class User implements ITemplatable
 
     /**
      * loads all user data from DB
+     * @return User
      */
-    protected function loadUserData()
+    protected function loadUserData(): self
     {
         $stmt = Aelix::db()->prepare(
             'SELECT
@@ -91,102 +93,8 @@ class User implements ITemplatable
             $field = UserDataField::getFieldByRow($row['fieldID'], $row['fieldName']);
             $this->data[$row['fieldName']] = new UserData($this, $field, $row['dataID'], $row['value']);
         }
-    }
 
-    /**
-     * @param string $fieldName
-     * @return mixed|null value, null if not exists
-     */
-    public function getData($fieldName)
-    {
-        if (isset($this->data[$fieldName]) && $this->data[$fieldName] instanceof UserData) {
-            return $this->data[$fieldName]->getValue();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @param string $fieldName
-     * @param mixed $value
-     */
-    public function setData($fieldName, $value)
-    {
-        if (isset($this->data[$fieldName])) {
-            $this->data[$fieldName]->setValue($value);
-            return;
-        }
-
-        // check if we need a new field
-        $field = UserDataField::createField($fieldName);
-        $this->data[$field->getName()] = UserData::create($field, $this, $value);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFullname()
-    {
-        return $this->fullname;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @return int
-     */
-    public function getID()
-    {
-        return $this->id;
-    }
-
-    /**
-     * check password
-     * @param string $password clear text password
-     * @return bool
-     */
-    public function checkPassword($password)
-    {
-        return USecurity::checkPassword($password, $this->passwordHash);
-    }
-
-    /**
-     * check password security
-     * @see USecurity::checkPasswordSecurity()
-     * @return bool
-     */
-    public function checkPasswordSecurity()
-    {
-        return USecurity::checkPasswordSecurity($this->passwordHash);
-    }
-
-    /**
-     * @param string $password clear text password
-     * @param int $hashCost
-     */
-    public function setPassword($password, $hashCost = USecurity::HASHING_COST)
-    {
-        $hash = USecurity::encryptPassword($password, $hashCost);
-
-        Aelix::db()->prepare('UPDATE `user` SET `passwordHash` = :hash WHERE `id` = :id')
-            ->execute([
-                ':hash' => $hash,
-                ':id' => $this->id
-            ]);
+        return $this;
     }
 
     /**
@@ -194,7 +102,7 @@ class User implements ITemplatable
      * @return User
      * @throws UserDoesntExistException
      */
-    public static function getByID($userID)
+    public static function getByID(int $userID): self
     {
         if (isset(self::$userByID[$userID]) && self::$userByID[$userID] instanceof User) {
             return self::$userByID[$userID];
@@ -215,6 +123,14 @@ class User implements ITemplatable
     }
 
     /**
+     * @return int
+     */
+    public function getID(): int
+    {
+        return $this->id;
+    }
+
+    /**
      * @param string $username
      * @param string $email
      * @param string $fullname
@@ -222,8 +138,13 @@ class User implements ITemplatable
      * @param int $hashCost
      * @return User
      */
-    public static function create($username, $email, $fullname, $password, $hashCost = USecurity::HASHING_COST)
-    {
+    public static function create(
+        string $username,
+        string $email,
+        string $fullname,
+        string $password,
+        int $hashCost = USecurity::HASHING_COST
+    ): self {
         $passwordHash = USecurity::encryptPassword($password, $hashCost);
 
         Aelix::db()->prepare('INSERT INTO `user` SET
@@ -253,10 +174,94 @@ class User implements ITemplatable
     }
 
     /**
+     * @param string $fieldName
+     * @return mixed|null value, null if not exists
+     */
+    public function getData(string $fieldName)
+    {
+        if (isset($this->data[$fieldName]) && $this->data[$fieldName] instanceof UserData) {
+            return $this->data[$fieldName]->getValue();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param string $fieldName
+     * @param mixed $value
+     * @return User
+     */
+    public function setData(string $fieldName, $value): self
+    {
+        if (isset($this->data[$fieldName])) {
+            $this->data[$fieldName]->setValue($value);
+            return $this;
+        }
+
+        // check if we need a new field
+        $field = UserDataField::createField($fieldName);
+        $this->data[$field->getName()] = UserData::create($field, $this, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFullname(): string
+    {
+        return $this->fullname;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * check password
+     * @param string $password clear text password
+     * @return bool
+     */
+    public function checkPassword(string $password): bool
+    {
+        return USecurity::checkPassword($password, $this->passwordHash);
+    }
+
+    /**
+     * @param string $password clear text password
+     * @param int $hashCost
+     * @return User
+     */
+    public function setPassword(string $password, int $hashCost = USecurity::HASHING_COST): self
+    {
+        $hash = USecurity::encryptPassword($password, $hashCost);
+
+        Aelix::db()->prepare('UPDATE `user` SET `passwordHash` = :hash WHERE `id` = :id')
+            ->execute([
+                ':hash' => $hash,
+                ':id' => $this->id
+            ]);
+
+        return $this;
+    }
+
+    /**
      * get an associative array suitable for assigning to template variables
      * @return array
      */
-    public function getTemplateArray()
+    public function getTemplateArray(): array
     {
         $data = [];
         if ($this->data) {
@@ -273,5 +278,15 @@ class User implements ITemplatable
             'passwordNeedsRehash' => $this->checkPasswordSecurity(),
             'data' => $data
         ];
+    }
+
+    /**
+     * check password security
+     * @see USecurity::checkPasswordSecurity()
+     * @return bool
+     */
+    public function checkPasswordSecurity(): bool
+    {
+        return USecurity::checkPasswordSecurity($this->passwordHash);
     }
 }

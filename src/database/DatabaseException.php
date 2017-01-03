@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\database;
 
@@ -49,7 +50,7 @@ class DatabaseException extends CoreException
      * @param Database $db
      * @param DatabaseStatement|null $statement
      */
-    public function __construct($message, Database $db, DatabaseStatement $statement = null)
+    public function __construct(string $message, Database $db, ?DatabaseStatement $statement = null)
     {
         $this->db = $db;
         $this->statement = $statement;
@@ -70,7 +71,7 @@ class DatabaseException extends CoreException
     /**
      * @return int
      */
-    public function getSqlErrorCode()
+    public function getSqlErrorCode(): int
     {
         return $this->sqlErrorCode;
     }
@@ -78,27 +79,12 @@ class DatabaseException extends CoreException
     /**
      * @return string
      */
-    public function getSqlVersion()
-    {
-        if ($this->sqlVersion === '') {
-            try {
-                $this->sqlVersion = $this->db->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION);
-            } catch (\PDOException $e) {
-                return 'unknown';
-            }
-        }
-        return $this->sqlVersion;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDbDriverName()
+    public function getDbDriverName(): string
     {
         return $this->dbDriverName;
     }
 
-    public function show()
+    public function show(): void
     {
         // debugDumpParams() can only output, need to catch that
         ob_start();
@@ -116,6 +102,21 @@ class DatabaseException extends CoreException
             $this->information .= '<strong>SQL query:</strong> ' . UString::encodeHTML($debugDumpParams) . '<br>' . NL;
         }
         parent::show();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSqlVersion(): string
+    {
+        if ($this->sqlVersion === '') {
+            try {
+                $this->sqlVersion = $this->db->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            } catch (\PDOException $e) {
+                return 'unknown';
+            }
+        }
+        return $this->sqlVersion;
     }
 
 }

@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\route;
 
@@ -14,6 +15,9 @@ namespace aelix\framework\route;
 class Route
 {
 
+    /**
+     * available HTTP methods
+     */
     const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
     /**
@@ -45,6 +49,7 @@ class Route
 
     /**
      * Route constructor.
+     * @param string $name
      * @param string|array $methods
      * @param string $url
      * @param callable $handler

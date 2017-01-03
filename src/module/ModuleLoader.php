@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\module;
 
@@ -24,7 +25,11 @@ class ModuleLoader
      */
     protected $modulesDir;
 
-    public function __construct($modulesDir)
+    /**
+     * ModuleLoader constructor.
+     * @param string $modulesDir
+     */
+    public function __construct(string $modulesDir)
     {
         $this->modulesDir = $modulesDir;
 
@@ -46,8 +51,9 @@ class ModuleLoader
 
     /**
      * register module namespaces to autoloader
+     * @return ModuleLoader
      */
-    public function registerNamespaces()
+    public function registerNamespaces(): self
     {
         foreach ($this->modules as $module) {
             chdir($this->modulesDir . $module->getName());
@@ -64,25 +70,33 @@ class ModuleLoader
         }
 
         chdir(DIR_START);
+
+        return $this;
     }
 
     /**
      * load all modules
+     * @return ModuleLoader
      */
-    public function load()
+    public function load(): self
     {
         foreach ($this->modules as $module) {
             $module->onLoad();
         }
+
+        return $this;
     }
 
     /**
      * unload all modules
+     * @return ModuleLoader
      */
-    public function unload()
+    public function unload(): self
     {
         foreach ($this->modules as $module) {
             $module->onUnload();
         }
+
+        return $this;
     }
 }

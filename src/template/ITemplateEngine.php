@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\template;
 
@@ -18,12 +19,18 @@ interface ITemplateEngine
     public function __construct(array $directories, $caching = true);
 
     /**
+     * is this template engine supported on this platform?
+     * @return bool
+     */
+    public static function isSupported(): bool;
+
+    /**
      * add a directory to template search dirs
      * @param string $directory
      * @param bool|true $primary
      * @return ITemplateEngine
      */
-    public function addDir($directory, $primary = true);
+    public function addDir($directory, $primary = true): ITemplateEngine;
 
     /**
      * assign template variables
@@ -33,7 +40,7 @@ interface ITemplateEngine
      * @param bool $merge
      * @return ITemplateEngine
      */
-    public function assign(array $variables, $merge = false);
+    public function assign(array $variables, $merge = false): ITemplateEngine;
 
     /**
      * display the template
@@ -41,7 +48,7 @@ interface ITemplateEngine
      * @param bool $defaultExtension if to use the default template engine's file extension for template files
      * @return ITemplateEngine
      */
-    public function display($template, $defaultExtension = false);
+    public function display($template, $defaultExtension = false): ITemplateEngine;
 
     /**
      * parse the template and return it as string
@@ -49,11 +56,5 @@ interface ITemplateEngine
      * @param bool $defaultExtension if to use the default template engine's file extension for template files
      * @return string
      */
-    public function parse($template, $defaultExtension = false);
-
-    /**
-     * is this template engine supported on this platform?
-     * @return bool
-     */
-    public static function isSupported();
+    public function parse($template, $defaultExtension = false): string;
 }

@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\user;
 
@@ -29,16 +30,11 @@ class GuestUser extends User
         ]);
     }
 
-    protected function loadUserData()
-    {
-        return;
-    }
-
     /**
      * @param string $fieldName
      * @return mixed|null value, null if not exists
      */
-    public function getData($fieldName)
+    public function getData(string $fieldName)
     {
         return null;
     }
@@ -46,56 +42,30 @@ class GuestUser extends User
     /**
      * @param string $fieldName
      * @param mixed $value
+     * @return User
      */
-    public function setData($fieldName, $value)
+    public function setData(string $fieldName, $value): User
     {
-        return;
+        return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFullname()
-    {
-        return $this->fullname;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @return int
-     */
-    public function getID()
-    {
-        return $this->id;
-    }
-
-    public function checkPassword($password)
+    public function checkPassword(string $password): bool
     {
         return false;
     }
 
-    public function checkPasswordSecurity()
+    public function checkPasswordSecurity(): bool
     {
         return true;
     }
 
-    public function setPassword($password, $hashCost = USecurity::HASHING_COST)
+    public function setPassword(string $password, int $hashCost = USecurity::HASHING_COST): User
     {
-        return;
+        return $this;
+    }
+
+    protected function loadUserData(): User
+    {
+        return $this;
     }
 }

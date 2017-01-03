@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\template;
 
@@ -20,7 +21,7 @@ class TemplateEngineFactory
      * @return ITemplateEngine
      * @throws CoreException
      */
-    public static function initTemplateEngine($engine, $directories = [], $caching = true)
+    public static function initTemplateEngine(string $engine, array $directories = [], $caching = true): ITemplateEngine
     {
         $engineClass = '\aelix\framework\template\engine\\' . $engine . 'TemplateEngine';
 

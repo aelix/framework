@@ -4,8 +4,11 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\database;
+
+use PDO;
 
 abstract class Database
 {
@@ -27,8 +30,13 @@ abstract class Database
      * @param string $database database to use
      * @param int $port port number if necessary
      */
-    public function __construct($host = '', $username = '', $password = '', $database = '', $port = 0)
-    {
+    public function __construct(
+        string $host = '',
+        string $username = '',
+        string $password = '',
+        string $database = '',
+        int $port = 0
+    ) {
         $this->databaseName = $database;
         $this->pdo = $this->connect($host, $username, $password, $database, $port);
     }
@@ -42,13 +50,19 @@ abstract class Database
      *
      * @return \PDO
      */
-    abstract protected function connect($host = '', $username = '', $password = '', $database = '', $port = 0);
+    abstract protected function connect(
+        string $host = '',
+        string $username = '',
+        string $password = '',
+        string $database = '',
+        int $port = 0
+    ): PDO;
 
     /**
      * Is this database driver supported on this platform?
      * @return bool
      */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return false;
     }
@@ -57,12 +71,12 @@ abstract class Database
      * Get name of database driver currently in use
      * @return string
      */
-    abstract public function getDriverName();
+    abstract public function getDriverName(): string;
 
     /**
      * @return \PDO
      */
-    public final function getPDO()
+    public final function getPDO(): PDO
     {
         return $this->pdo;
     }
@@ -74,7 +88,7 @@ abstract class Database
      * @return DatabaseStatement
      * @throws DatabaseException
      */
-    public function query($query)
+    public function query(string $query): ?DatabaseStatement
     {
         try {
             $pdoStatement = $this->pdo->query($query);
@@ -95,7 +109,7 @@ abstract class Database
      * @return DatabaseStatement
      * @throws DatabaseException
      */
-    public function prepare($query)
+    public function prepare(string $query): ?DatabaseStatement
     {
         try {
             $pdoStatement = $this->pdo->prepare($query);
@@ -112,7 +126,7 @@ abstract class Database
     /**
      * @return string
      */
-    public function getDatabaseName()
+    public function getDatabaseName(): string
     {
         return $this->databaseName;
     }

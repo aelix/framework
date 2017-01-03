@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework;
 
@@ -16,17 +17,20 @@ class EventHandler
      * @param string $hook
      * @param callable $callable
      * @param int $priority
+     * @return EventHandler
      */
-    public function listen($hook, callable $callable, $priority = 0)
+    public function listen(string $hook, callable $callable, $priority = 0): self
     {
         $this->events[$hook][] = [$callable, $priority];
+        return $this;
     }
 
     /**
      * @param string $hook
      * @param array $args
+     * @return EventHandler
      */
-    public function dispatch($hook, array $args = [])
+    public function dispatch(string $hook, array $args = []): self
     {
         if (isset($this->events[$hook])) {
             // additional call parameters
@@ -47,5 +51,7 @@ class EventHandler
                 call_user_func_array($listener[0], $args);
             }
         }
+
+        return $this;
     }
 }

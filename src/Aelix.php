@@ -4,10 +4,12 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework;
 
 use aelix\framework\config\Config;
+use aelix\framework\database\Database;
 use aelix\framework\database\DatabaseFactory;
 use aelix\framework\exception\CoreException;
 use aelix\framework\exception\IPrintableException;
@@ -72,7 +74,7 @@ class Aelix
      * @param bool|false $initOnly only initialize basic functions, don't output anything (e.g. for migrations)
      * @throws CoreException
      */
-    public final function __construct($initOnly = false)
+    public final function __construct(bool $initOnly = false)
     {
         // register error and exception handler
         set_exception_handler(['\aelix\framework\Aelix', 'handleException']);
@@ -157,10 +159,26 @@ class Aelix
     }
 
     /**
+     * @return EventHandler
+     */
+    public final static function event(): EventHandler
+    {
+        return self::$eventHandler;
+    }
+
+    /**
+     * @return Config
+     */
+    public final static function config(): Config
+    {
+        return self::$config;
+    }
+
+    /**
      * show exceptions
      * @param \Throwable $e
      */
-    public final static function handleException(\Throwable $e)
+    public final static function handleException(\Throwable $e): void
     {
         if ($e instanceof IPrintableException) {
             $e->show();
@@ -178,7 +196,7 @@ class Aelix
      * @param integer $lineNo
      * @throws CoreException
      */
-    public final static function handleError($errorNo, $message, $filename, $lineNo)
+    public final static function handleError(int $errorNo, string $message, string $filename, int $lineNo): void
     {
         if (error_reporting() != 0) {
             $type = 'error';
@@ -201,8 +219,11 @@ class Aelix
      * @return ITemplateEngine
      * @throws CoreException
      */
-    public final static function initTemplateEngine($engine, $directories = [], $caching = true)
-    {
+    public final static function initTemplateEngine(
+        string $engine,
+        array $directories = [],
+        bool $caching = true
+    ): ITemplateEngine {
         self::$templateEngine = TemplateEngineFactory::initTemplateEngine($engine, $directories, $caching);
         return self::$templateEngine;
     }
@@ -210,7 +231,7 @@ class Aelix
     /**
      * @return ITemplateEngine
      */
-    public static function templateEngine()
+    public static function templateEngine(): ITemplateEngine
     {
         return self::$templateEngine;
     }
@@ -218,39 +239,23 @@ class Aelix
     /**
      * @return Autoloader
      */
-    public final static function autoloader()
+    public final static function autoloader(): Autoloader
     {
         return self::$autoloader;
     }
 
     /**
-     * @return Config
-     */
-    public final static function config()
-    {
-        return self::$config;
-    }
-
-    /**
      * @return database\Database
      */
-    public final static function db()
+    public final static function db(): Database
     {
         return self::$db;
     }
 
     /**
-     * @return EventHandler
-     */
-    public final static function event()
-    {
-        return self::$eventHandler;
-    }
-
-    /**
      * @return Router
      */
-    public final static function router()
+    public final static function router(): Router
     {
         return self::$router;
     }
@@ -258,7 +263,7 @@ class Aelix
     /**
      * @return Session
      */
-    public static function session()
+    public static function session(): Session
     {
         return self::$session;
     }
@@ -266,7 +271,7 @@ class Aelix
     /**
      * @return User
      */
-    public static function user()
+    public static function user(): User
     {
         return self::$user;
     }
@@ -274,7 +279,7 @@ class Aelix
     /**
      * @return bool
      */
-    public final static function isDebug()
+    public final static function isDebug(): bool
     {
         return AELIX_DEBUG;
     }

@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
-
+declare(strict_types = 1);
 
 use aelix\framework\module\Module;
 
@@ -13,7 +13,7 @@ class aelix_database_driver_mysql extends Module
     /**
      * function called on load of the module
      */
-    public function onLoad()
+    public function onLoad(): void
     {
 
     }
@@ -21,7 +21,7 @@ class aelix_database_driver_mysql extends Module
     /**
      * method called on unloading the module
      */
-    public function onUnload()
+    public function onUnload(): void
     {
 
     }
@@ -34,7 +34,7 @@ class aelix_database_driver_mysql extends Module
      *
      * @return array
      */
-    public function getNamespaces()
+    public function getNamespaces(): array
     {
         return [
             'aelix\\framework\\database\\driver' => 'src'

@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\user;
 
@@ -32,69 +33,10 @@ class UserDataField
      * @param int $fieldID
      * @param string $fieldName
      */
-    protected function __construct($fieldID, $fieldName)
+    protected function __construct(int $fieldID, string $fieldName)
     {
         $this->id = $fieldID;
         $this->name = $fieldName;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        Aelix::db()->prepare('UPDATE `user_data_field` SET `fieldName` = :name WHERE `id` = :id')
-            ->execute([
-                ':name' => $this->name,
-                ':id' => $this->id
-            ]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getID()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Try to find an existing data field
-     * @param string $fieldName
-     * @return UserDataField|null Null if not found
-     */
-    public static function getField($fieldName)
-    {
-        // check cache
-        if (isset(self::$fields[$fieldName]) && self::$fields[$fieldName] instanceof UserDataField) {
-            return self::$fields[$fieldName];
-        } else {
-            // search in DB
-            $stmt = Aelix::db()->prepare('SELECT * FROM `user_data_field` WHERE `fieldName` = :fieldName')
-                ->execute([
-                    ':fieldName' => $fieldName
-                ]);
-
-            if ($stmt->rowCount() == 1) {
-                // create from DB
-                $row = $stmt->fetchArray();
-                $obj = new UserDataField($row['id'], $row['fieldName']);
-                self::$fields[$row['fieldName']] = $obj;
-                return $obj;
-            } else {
-                // field not defined
-                return null;
-            }
-        }
     }
 
     /**
@@ -102,7 +44,7 @@ class UserDataField
      * @param string $fieldName
      * @return UserDataField
      */
-    public static function createField($fieldName)
+    public static function createField($fieldName): self
     {
         // is already cached?
         if (isset(self::$fields[$fieldName]) && self::$fields[$fieldName] instanceof UserDataField) {
@@ -133,7 +75,42 @@ class UserDataField
         return $obj;
     }
 
-    public static function getFieldByRow($fieldID, $fieldName)
+    /**
+     * Try to find an existing data field
+     * @param string $fieldName
+     * @return UserDataField|null Null if not found
+     */
+    public static function getField($fieldName): ?self
+    {
+        // check cache
+        if (isset(self::$fields[$fieldName]) && self::$fields[$fieldName] instanceof UserDataField) {
+            return self::$fields[$fieldName];
+        } else {
+            // search in DB
+            $stmt = Aelix::db()->prepare('SELECT * FROM `user_data_field` WHERE `fieldName` = :fieldName')
+                ->execute([
+                    ':fieldName' => $fieldName
+                ]);
+
+            if ($stmt->rowCount() == 1) {
+                // create from DB
+                $row = $stmt->fetchArray();
+                $obj = new UserDataField($row['id'], $row['fieldName']);
+                self::$fields[$row['fieldName']] = $obj;
+                return $obj;
+            } else {
+                // field not defined
+                return null;
+            }
+        }
+    }
+
+    /**
+     * @param int $fieldID
+     * @param string $fieldName
+     * @return UserDataField
+     */
+    public static function getFieldByRow(int $fieldID, string $fieldName): self
     {
         // check cache
         if (isset(self::$fields[$fieldName]) && self::$fields[$fieldName] instanceof UserDataField) {
@@ -143,6 +120,38 @@ class UserDataField
             self::$fields[$fieldName] = $obj;
             return $obj;
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getID(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return UserDataField
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        Aelix::db()->prepare('UPDATE `user_data_field` SET `fieldName` = :name WHERE `id` = :id')
+            ->execute([
+                ':name' => $this->name,
+                ':id' => $this->id
+            ]);
+
+        return $this;
     }
 
 }

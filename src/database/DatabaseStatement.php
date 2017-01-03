@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\database;
 
@@ -57,7 +58,7 @@ class DatabaseStatement
      * @param \PDOStatement $pdoStatement
      * @param string $query
      */
-    public function __construct(Database $database, \PDOStatement $pdoStatement, $query)
+    public function __construct(Database $database, ?\PDOStatement $pdoStatement, string $query)
     {
         $this->database = $database;
         $this->pdoStatement = $pdoStatement;
@@ -66,10 +67,10 @@ class DatabaseStatement
 
     /**
      * @param array $parameters
-     * @return $this
+     * @return DatabaseStatement
      * @throws DatabaseException
      */
-    public function execute($parameters = [])
+    public function execute($parameters = []): self
     {
         $this->parameters = $parameters;
 
@@ -86,12 +87,22 @@ class DatabaseStatement
         return $this;
     }
 
-    public function __get($name)
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get(string $name)
     {
         return $this->pdoStatement->{$name};
     }
 
-    public function __call($name, $arguments)
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     * @throws DatabaseException
+     */
+    public function __call(string $name, array $arguments)
     {
         try {
             return call_user_func_array([$this->pdoStatement, $name], $arguments);
@@ -104,7 +115,7 @@ class DatabaseStatement
      * @param int $type
      * @return array
      */
-    public function fetchAllArray($type = \PDO::FETCH_ASSOC)
+    public function fetchAllArray(int $type = \PDO::FETCH_ASSOC)
     {
         $return = [];
         while ($row = $this->fetchArray($type)) {
@@ -119,7 +130,7 @@ class DatabaseStatement
      * @param int $type
      * @return array
      */
-    public function fetchArray($type = \PDO::FETCH_ASSOC)
+    public function fetchArray(int $type = \PDO::FETCH_ASSOC)
     {
         return $this->pdoStatement->fetch($type);
     }
@@ -127,7 +138,7 @@ class DatabaseStatement
     /**
      * @return \stdClass[]
      */
-    public function fetchAllObject()
+    public function fetchAllObject(): array
     {
         $return = [];
         while ($row = $this->fetchObject()) {
@@ -139,7 +150,7 @@ class DatabaseStatement
     /**
      * @return string
      */
-    public function getQuery()
+    public function getQuery(): string
     {
         return $this->query;
     }
@@ -147,10 +158,10 @@ class DatabaseStatement
     /**
      * Get id of last inserted row
      * @see \PDO::lastInsertId()
-     * @param null $table
+     * @param string $table
      * @return string
      */
-    public function getLastInsertID($table = null)
+    public function getLastInsertID(?string $table = null): string
     {
         return $this->database->getPDO()->lastInsertId($table);
     }
@@ -158,7 +169,7 @@ class DatabaseStatement
     /**
      * @return string
      */
-    public function getErrorDescription()
+    public function getErrorDescription(): string
     {
         if ($this->pdoStatement !== null) {
             if (isset($this->pdoStatement->errorInfo()[2])) {

@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\util;
 
@@ -20,9 +21,9 @@ class USecurity
      * hash a new password
      * @param string $password clear text password
      * @param int $hashingCost hashing cost. more = secure but slower
-     * @return string|bool
+     * @return string
      */
-    public static function encryptPassword($password, $hashingCost = self::HASHING_COST)
+    public static function encryptPassword(string $password, int $hashingCost = self::HASHING_COST): string
     {
         return password_hash($password, self::HASHING_ALGO, ['cost' => $hashingCost]);
     }
@@ -33,7 +34,7 @@ class USecurity
      * @param string $hash current hash
      * @return bool
      */
-    public static function checkPasswordSecurity($hash)
+    public static function checkPasswordSecurity(string $hash): bool
     {
         /*
          * PHP offers a password_needs_rehash() function, but it only checks if the values are the same.
@@ -55,7 +56,7 @@ class USecurity
         return false;
     }
 
-    public static function checkPassword($password, $hash)
+    public static function checkPassword(string $password, string $hash): bool
     {
         return password_verify($password, $hash);
     }

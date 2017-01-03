@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\exception;
 
@@ -14,34 +15,21 @@ use aelix\framework\util\UString;
 class CoreException extends LoggedException implements IPrintableException
 {
 
-    public function __construct($message = '', $code = 0, $description = '', \Throwable $previous = null)
-    {
+    public function __construct(
+        string $message = '',
+        int $code = 0,
+        string $description = '',
+        ?\Throwable $previous = null
+    ) {
         parent::__construct((string)$message, (int)$code, $previous);
         $this->description = $description;
-    }
-
-    /**
-     * Strip delicate information from shown stacktrace
-     * @return string
-     */
-    public function __getTraceAsString()
-    {
-        $e = ($this->getPrevious() ?: $this);
-
-        $string = preg_replace('/Database->__construct\(.*\)/', 'Database->__construct(...)', $e->getTraceAsString());
-        $string = preg_replace('/Database->connect\(.*\)/', 'Database->connect(...)', $string);
-        $string = preg_replace('/DatabaseFactory::initDatabase\(.*\)/', 'DatabaseFactory::initDatabase(...)', $string);
-        $string = preg_replace('/mysqli->mysqli\(.*\)/', 'mysqli->mysqli(...)', $string);
-        $string = preg_replace('/PDO->__construct\(.*\)/', 'PDO->__construct(...)', $string);
-
-        return $string;
     }
 
     /**
      * Print this exception
      * @return void
      */
-    public function show()
+    public function show(): void
     {
         // try to log this shit
         $id = $this->logError();
@@ -120,6 +108,23 @@ class CoreException extends LoggedException implements IPrintableException
         }
         echo '	</body>
 </html>';
+    }
+
+    /**
+     * Strip delicate information from shown stacktrace
+     * @return string
+     */
+    public function __getTraceAsString(): string
+    {
+        $e = ($this->getPrevious() ?: $this);
+
+        $string = preg_replace('/Database->__construct\(.*\)/', 'Database->__construct(...)', $e->getTraceAsString());
+        $string = preg_replace('/Database->connect\(.*\)/', 'Database->connect(...)', $string);
+        $string = preg_replace('/DatabaseFactory::initDatabase\(.*\)/', 'DatabaseFactory::initDatabase(...)', $string);
+        $string = preg_replace('/mysqli->mysqli\(.*\)/', 'mysqli->mysqli(...)', $string);
+        $string = preg_replace('/PDO->__construct\(.*\)/', 'PDO->__construct(...)', $string);
+
+        return $string;
     }
 
 

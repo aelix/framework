@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\template\engine;
 
@@ -71,12 +72,22 @@ class TwigTemplateEngine implements ITemplateEngine
     }
 
     /**
+     * is this template engine supported on this platform?
+     * @return bool
+     */
+    public static function isSupported(): bool
+    {
+        // twig needs to be loaded via composer
+        return class_exists('Twig_Environment', true);
+    }
+
+    /**
      * add a directory to template search dirs
      * @param string $directory
      * @param bool|true $primary
-     * @return ITemplateEngine|void
+     * @return ITemplateEngine
      */
-    public function addDir($directory, $primary = true)
+    public function addDir($directory, $primary = true): ITemplateEngine
     {
         if ($primary) {
             $this->twigLoader->prependPath($directory);
@@ -89,25 +100,13 @@ class TwigTemplateEngine implements ITemplateEngine
         return $this;
     }
 
-
-
-    /**
-     * is this template engine supported on this platform?
-     * @return bool
-     */
-    public static function isSupported()
-    {
-        // twig needs to be loaded via composer
-        return class_exists('Twig_Environment', true);
-    }
-
     /**
      * display the template
      * @param string $template template name
      * @param bool $defaultExtension if to use the default template engine's file extension for template files
      * @return ITemplateEngine
      */
-    public function display($template, $defaultExtension = false)
+    public function display($template, $defaultExtension = false): ITemplateEngine
     {
         $this->twigEnv->display($template . ($defaultExtension ? self::DEFAULT_EXTENSION : ''), $this->variables);
         return $this;
@@ -119,7 +118,7 @@ class TwigTemplateEngine implements ITemplateEngine
      * @param bool $defaultExtension if to use the default template engine's file extension for template files
      * @return string
      */
-    public function parse($template, $defaultExtension = false)
+    public function parse($template, $defaultExtension = false): string
     {
         return $this->twigEnv->render($template . ($defaultExtension ? self::DEFAULT_EXTENSION : ''), $this->variables);
     }
@@ -132,7 +131,7 @@ class TwigTemplateEngine implements ITemplateEngine
      * @param bool $merge
      * @return ITemplateEngine
      */
-    public function assign(array $variables, $merge = false)
+    public function assign(array $variables, $merge = false): ITemplateEngine
     {
         if ($merge) {
             // if key is in first array, keep it
@@ -150,7 +149,8 @@ class TwigTemplateEngine implements ITemplateEngine
      * @param array $variables
      * @return array
      */
-    protected function convertVariables(array $variables) {
+    protected function convertVariables(array $variables): array
+    {
         $temp = [];
 
         foreach ($variables as $key => $var) {
@@ -168,8 +168,11 @@ class TwigTemplateEngine implements ITemplateEngine
 
     /**
      * @param \Twig_ExtensionInterface $extension
+     * @return ITemplateEngine
      */
-    public function registerExtension(\Twig_ExtensionInterface $extension) {
+    public function registerExtension(\Twig_ExtensionInterface $extension): ITemplateEngine
+    {
         $this->twigEnv->addExtension($extension);
+        return $this;
     }
 }

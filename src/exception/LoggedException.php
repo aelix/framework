@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\exception;
 
@@ -28,7 +29,7 @@ class LoggedException extends \Exception
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -36,7 +37,7 @@ class LoggedException extends \Exception
     /**
      * @return string
      */
-    public function getInformation()
+    public function getInformation(): string
     {
         return $this->information;
     }
@@ -45,7 +46,7 @@ class LoggedException extends \Exception
      * Hide the real message from being displayed when not in debug mode
      * @return string
      */
-    public function _getMessage()
+    public function _getMessage(): string
     {
         if (Aelix::isDebug()) {
             $e = ($this->getPrevious() ?: $this);
@@ -59,7 +60,7 @@ class LoggedException extends \Exception
      * Log this exception.
      * @return string ID of the logged exception
      */
-    protected function logError()
+    protected function logError(): string
     {
         $logDir = DIR_ROOT . 'logs/';
         $logFilePath = $logDir . date('Y-m-d') . '.log';

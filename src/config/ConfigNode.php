@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\config;
 
@@ -49,7 +50,7 @@ class ConfigNode
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -64,8 +65,9 @@ class ConfigNode
 
     /**
      * @param mixed $value
+     * @return ConfigNode
      */
-    public function setValue($value)
+    public function setValue($value): self
     {
         $this->value = $value;
 
@@ -74,6 +76,8 @@ class ConfigNode
             ':id' => $this->id,
             ':value' => serialize($this->value)
         ]);
+
+        return $this;
     }
 
 }

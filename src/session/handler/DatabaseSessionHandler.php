@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\session\handler;
 
@@ -28,7 +29,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      * @param Database $db
      * @param string $tableName
      */
-    public function __construct(Database $db, $tableName)
+    public function __construct(Database $db, string $tableName)
     {
         $this->db = $db;
         $this->tableName = $tableName;
@@ -44,7 +45,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      * </p>
      * @since 5.4.0
      */
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -59,7 +60,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      * </p>
      * @since 5.4.0
      */
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         return (bool)$this->db->prepare('DELETE FROM `' . $this->tableName . '` WHERE `id` = :id')
             ->execute([
@@ -80,7 +81,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      * </p>
      * @since 5.4.0
      */
-    public function gc($maxlifetime)
+    public function gc($maxlifetime): bool
     {
         return (bool)$this->db->prepare('DELETE FROM `' . $this->tableName . '` WHERE `lastActivity` = :maxlifetime')
             ->execute([
@@ -99,7 +100,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      * </p>
      * @since 5.4.0
      */
-    public function open($save_path, $session_id)
+    public function open($save_path, $session_id): bool
     {
         return true;
     }
@@ -115,7 +116,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      * </p>
      * @since 5.4.0
      */
-    public function read($session_id)
+    public function read($session_id): string
     {
         $result = $this->db->prepare('SELECT * FROM `' . $this->tableName . '` WHERE `id` = :id')
             ->execute([
@@ -143,7 +144,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      * </p>
      * @since 5.4.0
      */
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
         // check if session exists
         $s = $this->db->prepare('SELECT COUNT(*) FROM `' . $this->tableName . '` WHERE `id` = :id')

@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\route;
 
@@ -31,9 +32,9 @@ class Router
     /**
      * Router constructor.
      * @param string $basePath
-     * @param RouteCollection|null $routeCollection
+     * @param RouteCollection $routeCollection
      */
-    public function __construct($basePath = '', RouteCollection $routeCollection = null)
+    public function __construct(string $basePath = '', ?RouteCollection $routeCollection = null)
     {
         $this->basePath = rtrim($basePath, '/');
 
@@ -152,12 +153,12 @@ class Router
     }
 
     /**
-     * @param $routeName
+     * @param string $routeName
      * @param array $parameters
      * @return string
      * @throws NamedRouteNotFoundException
      */
-    public function buildUrl($routeName, array $parameters = []): string
+    public function buildUrl(string $routeName, array $parameters = []): string
     {
 
         if (isset($this->namedRoutes[$routeName])) {

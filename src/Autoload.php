@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types = 1);
 namespace aelix\framework;
 
 /**
@@ -22,7 +22,7 @@ class Autoloader
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         spl_autoload_register([$this, 'loadClass']);
     }
@@ -38,7 +38,7 @@ class Autoloader
      * than last.
      * @return void
      */
-    public function addNamespace($prefix, $base_dir, $prepend = false)
+    public function addNamespace($prefix, $base_dir, $prepend = false): void
     {
         // normalize namespace prefix
         $prefix = trim($prefix, '\\') . '\\';
@@ -136,7 +136,7 @@ class Autoloader
      * @param string $file The file to require.
      * @return bool True if the file exists, false if not.
      */
-    protected function requireFile($file)
+    protected function requireFile($file): bool
     {
         if (file_exists($file)) {
             require $file;

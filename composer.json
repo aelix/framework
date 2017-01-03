@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": ">=7.0.0",
+    "php": ">=7.1.0",
     "twig/twig": "v1.23.1",
     "robmorgan/phinx": "v0.4.6"
   }

@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2015 aelix framework
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3
  */
+declare(strict_types = 1);
 
 namespace aelix\framework\database\driver;
 
@@ -17,6 +18,24 @@ class MySQLDatabase extends Database
 {
 
     /**
+     * Is this database driver supported on this platform?
+     * @return bool
+     */
+    public static function isSupported(): bool
+    {
+        return (extension_loaded('PDO') && extension_loaded('pdo_mysql'));
+    }
+
+    /**
+     * Get name of database driver currently in use
+     * @return string
+     */
+    public function getDriverName(): string
+    {
+        return 'MySQL';
+    }
+
+    /**
      * @param string $host SQL server's hostname/IP or file name
      * @param string $username username for login
      * @param string $password password for login
@@ -25,8 +44,13 @@ class MySQLDatabase extends Database
      * @return PDO
      * @throws CoreException
      */
-    protected function connect($host = '', $username = '', $password = '', $database = '', $port = 0)
-    {
+    protected function connect(
+        string $host = '',
+        string $username = '',
+        string $password = '',
+        string $database = '',
+        int $port = 0
+    ): PDO {
         // Set default port
         if ($port == 0) {
             $port = 3306;
@@ -39,7 +63,6 @@ class MySQLDatabase extends Database
 
         $dsn = 'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $database . ';charset=utf8';
 
-        $pdo = null;
         try {
             $pdo = new PDO($dsn, $username, $password, $options);
         } catch (PDOException $e) {
@@ -49,23 +72,5 @@ class MySQLDatabase extends Database
         }
 
         return $pdo;
-    }
-
-    /**
-     * Is this database driver supported on this platform?
-     * @return bool
-     */
-    public static function isSupported()
-    {
-        return (extension_loaded('PDO') && extension_loaded('pdo_mysql'));
-    }
-
-    /**
-     * Get name of database driver currently in use
-     * @return string
-     */
-    public function getDriverName()
-    {
-        return 'MySQL';
     }
 }
